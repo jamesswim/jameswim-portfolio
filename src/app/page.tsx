@@ -2,11 +2,23 @@
 
 import { useState, useEffect } from "react";
 
+const skills = [
+  "C/C++",
+  "Linux",
+  "Python",
+  "ROS",
+  "Jetson Nano",
+  "Raspberry Pi",
+  "UAV",
+  "OpenCV",
+];
+
 const content = {
   en: {
     greeting: "Hello, I'm",
     tagline: "Software Engineer · Linux · C++ · Embedded Systems",
     aboutLabel: "About",
+    skillsLabel: "Skills",
     aboutP1: (
       <>
         I&apos;m{" "}
@@ -58,6 +70,7 @@ const content = {
     greeting: "Hello, I'm",
     tagline: "軟體工程師 · Linux · C++ · 嵌入式系統",
     aboutLabel: "關於我",
+    skillsLabel: "技能",
     aboutP1: (
       <>
         我是<span className="text-neutral-100 font-medium">鄭泳禎</span>
@@ -184,6 +197,26 @@ export default function Home() {
             <p>{t.aboutP2}</p>
             <p>{t.aboutP3}</p>
             <p className="text-neutral-400 pt-4">{t.aboutP4}</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Skills Section */}
+      <section className="px-6 py-24 sm:py-32 border-t border-neutral-800">
+        <div className="max-w-2xl mx-auto">
+          <p className="text-xs uppercase tracking-[0.3em] text-neutral-500 mb-8">
+            {t.skillsLabel}
+          </p>
+
+          <div className="flex flex-wrap gap-3">
+            {skills.map((skill) => (
+              <span
+                key={skill}
+                className="px-4 py-2 text-sm text-neutral-300 border border-neutral-800 rounded-full hover:border-neutral-600 hover:text-neutral-100 transition-colors"
+              >
+                {skill}
+              </span>
+            ))}
           </div>
         </div>
       </section>
