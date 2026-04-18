@@ -160,12 +160,6 @@ export default function Home() {
               GitHub
             </a>
             <a
-              href="mailto:james384712@gmail.com"
-              className="text-neutral-500 hover:text-neutral-100 transition-colors"
-            >
-              Email
-            </a>
-            <a
               href="https://www.youtube.com/@jameswim1107"
               target="_blank"
               rel="noopener noreferrer"
