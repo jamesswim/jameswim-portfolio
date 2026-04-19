@@ -51,7 +51,7 @@ export default function AdminPage() {
   const signIn = async () => {
     await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: window.location.origin + "/admin" },
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
     });
   };
 
