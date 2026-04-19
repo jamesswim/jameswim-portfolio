@@ -175,6 +175,14 @@ export default function Home() {
             >
               Instagram
             </a>
+            <a
+              href="/blog"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-neutral-500 hover:text-neutral-100 transition-colors"
+            >
+              Blog
+            </a>
           </div>
         </div>
       </section>

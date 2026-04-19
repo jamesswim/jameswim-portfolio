@@ -56,7 +56,11 @@ export default function BlogPage() {
                 key={post.id}
                 className="border-b border-neutral-800 pb-8"
               >
-                <h2 className="text-xl font-semibold mb-2">{post.title}</h2>
+                <a href={`/blog/${post.id}`}>
+                  <h2 className="text-xl font-semibold mb-2 text-neutral-300 hover:text-white underline-offset-4 hover:underline transition-colors cursor-pointer">
+                    {post.title}
+                  </h2>
+                </a>
                 <p className="text-sm text-neutral-500 mb-4">
                   {new Date(post.created_at).toLocaleDateString()}
                 </p>
