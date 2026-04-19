@@ -139,12 +139,21 @@ export default function AdminPage() {
         </div>
 
         {!showForm ? (
-          <button
-            onClick={() => setShowForm(true)}
-            className="px-4 py-2 bg-neutral-100 text-neutral-950 rounded-lg text-sm font-medium hover:bg-white transition-colors mb-8"
-          >
-            + New Post
-          </button>
+          <div className="flex items-center gap-4 mb-8">
+            <button
+              onClick={() => setShowForm(true)}
+              className="px-4 py-2 bg-neutral-100 text-neutral-950 rounded-lg text-sm font-medium hover:bg-white transition-colors"
+            >
+              + New Post
+            </button>
+            <a
+              href="/"
+              style={{ color: "#3b82f6" }}
+              className="px-4 py-2 text-sm font-medium hover:opacity-80 transition-opacity"
+            >
+              ← Back to Home
+            </a>
+          </div>
         ) : (
           <div className="border border-neutral-800 rounded-lg p-6 mb-8">
             <h2 className="text-lg font-semibold mb-4">
