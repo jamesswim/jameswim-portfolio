@@ -222,6 +222,18 @@ export default function Home() {
           </div>
         </div>
       </section>
+      {/* Footer */}
+      <footer className="px-6 py-12 border-t border-neutral-800">
+        <div className="max-w-2xl mx-auto flex justify-between items-center text-xs text-neutral-600">
+          <p>&copy; 2026 Jameswim</p>
+          <a
+            href="/admin"
+            className="hover:text-neutral-400 transition-colors"
+          >
+            Admin
+          </a>
+        </div>
+      </footer>
     </main>
   );
 }
