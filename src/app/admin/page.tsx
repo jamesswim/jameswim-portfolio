@@ -139,7 +139,7 @@ export default function AdminPage() {
         </div>
 
         {!showForm ? (
-          <div className="flex items-center gap-4 mb-8">
+          <div className="flex items-center justify-between mb-8">
             <button
               onClick={() => setShowForm(true)}
               className="px-4 py-2 bg-neutral-100 text-neutral-950 rounded-lg text-sm font-medium hover:bg-white transition-colors"
@@ -148,8 +148,8 @@ export default function AdminPage() {
             </button>
             <a
               href="/"
-              style={{ color: "#3b82f6" }}
-              className="px-4 py-2 text-sm font-medium hover:opacity-80 transition-opacity"
+              className="px-4 py-2 rounded-lg text-sm font-medium text-white hover:opacity-80 transition-opacity"
+              style={{ backgroundColor: "#3b82f6" }}
             >
               ← Back to Home
             </a>
