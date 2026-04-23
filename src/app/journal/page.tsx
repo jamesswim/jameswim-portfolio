@@ -780,7 +780,7 @@ export default function JournalPage() {
                         onChange={(e) => setCategory(e.target.value)}
                         className="w-full bg-neutral-900 border border-neutral-800 rounded px-2 py-1.5 text-xs text-neutral-100 focus:outline-none focus:border-neutral-600"
                       >
-                        {DEFAULT_CATEGORIES.map((cat) => (
+                        {allCategories.map((cat) => (
                           <option key={cat} value={cat}>{cat}</option>
                         ))}
                         <option value="__custom__">自訂...</option>
