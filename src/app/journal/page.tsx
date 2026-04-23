@@ -65,6 +65,9 @@ export default function JournalPage() {
   const [viewMode, setViewMode] = useState<"month" | "year">("month");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [filterCategory, setFilterCategory] = useState("全部");
+  const [userCategories, setUserCategories] = useState<string[]>([]);
+  const [showCategoryManager, setShowCategoryManager] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState("");
   const [showSearchResults, setShowSearchResults] = useState(false);
 
   useEffect(() => {
@@ -81,8 +84,51 @@ export default function JournalPage() {
   }, []);
 
   useEffect(() => {
-    if (user) fetchEntries();
+    if (user) {
+      fetchEntries();
+      fetchCategories();
+    }
   }, [user]);
+
+  const fetchCategories = async () => {
+    const { data } = await supabase
+      .from("categories")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: true });
+
+    if (data && data.length === 0) {
+      const defaults = DEFAULT_CATEGORIES.map((name) => ({
+        name,
+        user_id: user.id,
+      }));
+      await supabase.from("categories").insert(defaults);
+      setUserCategories(DEFAULT_CATEGORIES);
+    } else {
+      setUserCategories(data ? data.map((c: any) => c.name) : []);
+    }
+  };
+
+  const addCategory = async () => {
+    if (!newCategoryName.trim()) return;
+    if (userCategories.includes(newCategoryName.trim())) return;
+    await supabase.from("categories").insert({
+      name: newCategoryName.trim(),
+      user_id: user.id,
+    });
+    setNewCategoryName("");
+    fetchCategories();
+  };
+
+  const deleteCategory = async (name: string) => {
+    if (!confirm(`確定要刪除「${name}」標籤嗎？`)) return;
+    await supabase
+      .from("categories")
+      .delete()
+      .eq("name", name)
+      .eq("user_id", user.id);
+    fetchCategories();
+  };
 
   const fetchEntries = async () => {
     const { data } = await supabase
@@ -207,7 +253,7 @@ export default function JournalPage() {
   });
 
   const allCategories = Array.from(
-    new Set([...DEFAULT_CATEGORIES, ...entries.map((e) => e.category)])
+    new Set([...userCategories, ...entries.map((e) => e.category)])
   );
 
   const categoryCounts: Record<string, number> = {};
@@ -913,7 +959,37 @@ export default function JournalPage() {
               className="border border-neutral-800 rounded-lg"
               style={{ backgroundColor: "#0f0f0f", padding: "16px" }}
             >
-              <p className="text-xs text-neutral-500 mb-3 font-medium">📂 分類標籤</p>
+              <div className="flex justify-between items-center mb-3">
+                <p className="text-xs text-neutral-500 font-medium">📂 分類標籤</p>
+                <button
+                  onClick={() => setShowCategoryManager(!showCategoryManager)}
+                  className="text-xs text-neutral-600 hover:text-neutral-400 transition-colors"
+                >
+                  {showCategoryManager ? "完成" : "管理"}
+                </button>
+              </div>
+
+              {showCategoryManager && (
+                <div className="mb-3 border-b border-neutral-800 pb-3">
+                  <div className="flex gap-2 mb-2">
+                    <input
+                      type="text"
+                      placeholder="新標籤名稱"
+                      value={newCategoryName}
+                      onChange={(e) => setNewCategoryName(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && addCategory()}
+                      className="flex-1 bg-neutral-900 border border-neutral-800 rounded px-2 py-1 text-xs text-neutral-100 placeholder-neutral-600 focus:outline-none focus:border-neutral-600"
+                    />
+                    <button
+                      onClick={addCategory}
+                      className="px-2 py-1 bg-neutral-100 text-neutral-950 rounded text-xs font-medium hover:bg-white transition-colors"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+              )}
+
               <div className="space-y-1">
                 <button
                   onClick={() => setFilterCategory("全部")}
@@ -926,17 +1002,27 @@ export default function JournalPage() {
                   全部 ({entries.length})
                 </button>
                 {allCategories.map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => setFilterCategory(cat)}
-                    className={`w-full text-left px-3 py-2 rounded text-xs transition-colors ${
-                      filterCategory === cat
-                        ? "bg-neutral-100 text-neutral-950 font-medium"
-                        : "text-neutral-400 hover:bg-neutral-800"
-                    }`}
-                  >
-                    {cat} ({categoryCounts[cat] || 0})
-                  </button>
+                  <div key={cat} className="flex items-center">
+                    <button
+                      onClick={() => setFilterCategory(cat)}
+                      className={`flex-1 text-left px-3 py-2 rounded text-xs transition-colors ${
+                        filterCategory === cat
+                          ? "bg-neutral-100 text-neutral-950 font-medium"
+                          : "text-neutral-400 hover:bg-neutral-800"
+                      }`}
+                    >
+                      {cat} ({categoryCounts[cat] || 0})
+                    </button>
+                    {showCategoryManager && (
+                      <button
+                        onClick={() => deleteCategory(cat)}
+                        className="text-xs px-1 hover:opacity-80 transition-opacity"
+                        style={{ color: "#dc2626" }}
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
                 ))}
               </div>
             </div>
