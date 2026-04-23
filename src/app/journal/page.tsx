@@ -232,8 +232,10 @@ export default function JournalPage() {
           )
       : [];
 
+  const isFilteringCategory = filterCategory !== "全部";
+
   const dayEntries = entries
-    .filter((e) => e.date === selectedDateStr)
+    .filter((e) => isFilteringCategory ? true : e.date === selectedDateStr)
     .filter(
       (e) => filterCategory === "全部" || e.category === filterCategory
     );
@@ -688,13 +690,17 @@ export default function JournalPage() {
             >
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-semibold">
-                  📅{" "}
-                  {selectedDate.toLocaleDateString("zh-TW", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                    weekday: "short",
-                  })}
+                  {isFilteringCategory ? (
+                    <>📂 「{filterCategory}」的所有日誌 ({dayEntries.length})</>
+                  ) : (
+                    <>📅{" "}
+                    {selectedDate.toLocaleDateString("zh-TW", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                      weekday: "short",
+                    })}</>
+                  )}
                 </h2>
                 {!showForm && (
                   <button
@@ -848,7 +854,7 @@ export default function JournalPage() {
                     <span className="text-neutral-600">({scheduledEntries.length})</span>
                   </h3>
                   <div className="space-y-2">
-                    {scheduledEntries.map((entry) => renderEntry(entry))}
+                    {scheduledEntries.map((entry) => renderEntry(entry, isFilteringCategory))}
                   </div>
                 </div>
               )}
@@ -862,7 +868,7 @@ export default function JournalPage() {
                     <span className="text-neutral-600">({todoEntries.length})</span>
                   </h3>
                   <div className="space-y-2">
-                    {todoEntries.map((entry) => renderEntry(entry))}
+                    {todoEntries.map((entry) => renderEntry(entry, isFilteringCategory))}
                   </div>
                 </div>
               )}
@@ -876,7 +882,7 @@ export default function JournalPage() {
                     <span className="text-neutral-600">({doingEntries.length})</span>
                   </h3>
                   <div className="space-y-2">
-                    {doingEntries.map((entry) => renderEntry(entry))}
+                    {doingEntries.map((entry) => renderEntry(entry, isFilteringCategory))}
                   </div>
                 </div>
               )}
@@ -890,7 +896,7 @@ export default function JournalPage() {
                     <span className="text-neutral-600">({doneEntries.length})</span>
                   </h3>
                   <div className="space-y-2">
-                    {doneEntries.map((entry) => renderEntry(entry))}
+                    {doneEntries.map((entry) => renderEntry(entry, isFilteringCategory))}
                   </div>
                 </div>
               )}
