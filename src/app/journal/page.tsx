@@ -29,6 +29,7 @@ interface Entry {
   date: string;
   time: string | null;
   end_date: string | null;
+  countdown: boolean;
   created_at: string;
 }
 
@@ -218,6 +219,14 @@ export default function JournalPage() {
   const handleDelete = async (id: string) => {
     if (!confirm("確定要刪除這筆日誌嗎？")) return;
     await supabase.from("journal").delete().eq("id", id);
+    fetchEntries();
+  };
+
+  const toggleCountdown = async (entry: Entry) => {
+    await supabase
+      .from("journal")
+      .update({ countdown: !entry.countdown })
+      .eq("id", entry.id);
     fetchEntries();
   };
 
@@ -425,6 +434,16 @@ export default function JournalPage() {
           </div>
         </div>
         <div className="flex gap-2 ml-2">
+          {entry.date >= new Date().toISOString().split("T")[0] && (
+            <button
+              onClick={() => toggleCountdown(entry)}
+              className="text-xs transition-colors"
+              style={{ color: entry.countdown ? "#facc15" : "#6b7280" }}
+              title={entry.countdown ? "取消倒數" : "添加至倒數"}
+            >
+              ⏳
+            </button>
+          )}
           <button
             onClick={() => handleEdit(entry)}
             className="text-xs text-neutral-500 hover:text-neutral-100 transition-colors"
@@ -559,6 +578,63 @@ export default function JournalPage() {
                     沒有找到符合的日誌。
                   </p>
                 )}
+                {/* Countdown */}
+            <div
+              className="border border-neutral-800 rounded-lg mt-4"
+              style={{ backgroundColor: "#0f0f0f", padding: "16px" }}
+            >
+              <p className="text-xs text-neutral-500 mb-3 font-medium">⏳ 倒數計時</p>
+              <div className="space-y-2">
+                {entries
+                  .filter((e) => e.countdown && e.date >= new Date().toISOString().split("T")[0])
+                  .sort((a, b) => a.date.localeCompare(b.date))
+                  .map((entry) => {
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    const target = new Date(entry.date + "T00:00:00");
+                    const diff = Math.ceil(
+                      (target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+                    );
+                    return (
+                      <div
+                        key={entry.id}
+                        className="p-2 rounded bg-neutral-900 flex justify-between items-center"
+                      >
+                        <div>
+                          <p className="text-xs font-medium truncate">{entry.title}</p>
+                          <p className="text-xs text-neutral-500">{entry.date}</p>
+                        </div>
+                        <div className="text-right ml-2">
+                          {diff === 0 ? (
+                            <span className="text-xs font-bold" style={{ color: "#dc2626" }}>
+                              今天！
+                            </span>
+                          ) : diff === 1 ? (
+                            <span className="text-xs font-bold" style={{ color: "#f97316" }}>
+                              明天
+                            </span>
+                          ) : diff <= 7 ? (
+                            <span className="text-xs font-bold" style={{ color: "#facc15" }}>
+                              {diff} 天
+                            </span>
+                          ) : (
+                            <span className="text-xs font-medium text-neutral-400">
+                              {diff} 天
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                {entries.filter(
+                  (e) => e.countdown && e.date >= new Date().toISOString().split("T")[0]
+                ).length === 0 && (
+                  <p className="text-xs text-neutral-600">
+                    點日誌旁的 ⏳ 添加倒數
+                  </p>
+                )}
+              </div>
+            </div>
             </div>
           </div>
 
