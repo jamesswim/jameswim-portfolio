@@ -28,6 +28,7 @@ interface Entry {
   status: string;
   date: string;
   time: string | null;
+  end_date: string | null;
   created_at: string;
 }
 
@@ -54,6 +55,7 @@ export default function JournalPage() {
     new Date().toISOString().split("T")[0]
   );
   const [entryTime, setEntryTime] = useState("");
+  const [entryEndDate, setEntryEndDate] = useState("");
   const [editing, setEditing] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [dateFrom, setDateFrom] = useState("");
@@ -107,6 +109,7 @@ export default function JournalPage() {
     setStatus("todo");
     setEntryDate(selectedDateStr);
     setEntryTime("");
+    setEntryEndDate("");
     setEditing(null);
     setShowForm(false);
   };
@@ -128,6 +131,7 @@ export default function JournalPage() {
           status,
           date: entryDate,
           time: entryTime || null,
+          end_date: entryEndDate || null,
         })
         .eq("id", editing);
     } else {
@@ -160,6 +164,7 @@ export default function JournalPage() {
     setStatus(entry.status);
     setEntryDate(entry.date);
     setEntryTime(entry.time || "");
+    setEntryEndDate(entry.end_date || "");
     setEditing(entry.id);
     setShowForm(true);
   };
@@ -185,6 +190,21 @@ export default function JournalPage() {
   const datesWithSchedule = new Set(
     entries.filter((e) => e.time).map((e) => e.date)
   );
+
+  const datesWithMultiDay = new Set<string>();
+  entries.forEach((e) => {
+    if (e.end_date && e.date !== e.end_date) {
+      const start = new Date(e.date + "T12:00:00");
+      const end = new Date(e.end_date + "T12:00:00");
+      const current = new Date(start);
+      while (current <= end) {
+        datesWithMultiDay.add(
+          `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, "0")}-${String(current.getDate()).padStart(2, "0")}`
+        );
+        current.setDate(current.getDate() + 1);
+      }
+    }
+  });
 
   const allCategories = Array.from(
     new Set([...DEFAULT_CATEGORIES, ...entries.map((e) => e.category)])
@@ -348,6 +368,11 @@ export default function JournalPage() {
               <span className="text-xs px-2 py-0.5 rounded-full bg-neutral-800 text-neutral-400">
                 {entry.category}
               </span>
+              {entry.end_date && (
+                        <span className="text-xs text-neutral-500">
+                          → {entry.end_date}
+                        </span>
+                      )}
             </div>
           </div>
         </div>
@@ -421,6 +446,7 @@ export default function JournalPage() {
                     setShowSearchResults(true);
                   }}
                   className="w-full bg-neutral-900 border border-neutral-800 rounded px-3 py-1.5 text-xs text-neutral-100 focus:outline-none focus:border-neutral-600"
+                  style={{ colorScheme: "dark" }}
                 />
               </div>
               <div className="mb-3">
@@ -433,6 +459,7 @@ export default function JournalPage() {
                     setShowSearchResults(true);
                   }}
                   className="w-full bg-neutral-900 border border-neutral-800 rounded px-3 py-1.5 text-xs text-neutral-100 focus:outline-none focus:border-neutral-600"
+                  style={{ colorScheme: "dark" }}
                 />
               </div>
 
@@ -590,9 +617,9 @@ export default function JournalPage() {
                               : "hover:bg-neutral-800 text-neutral-300"
                           }`}
                           style={
-                            hasSchedule && !isSelected
+                            (hasSchedule || datesWithMultiDay.has(dateStr)) && !isSelected
                               ? {
-                                  outline: "2px solid #facc15",
+                                  outline: hasSchedule ? "2px solid #facc15" : "2px solid #f97316",
                                   outlineOffset: "-2px",
                                   borderRadius: "6px",
                                 }
@@ -705,7 +732,7 @@ export default function JournalPage() {
                     className="w-full bg-neutral-900 border border-neutral-800 rounded px-3 py-2 mb-3 text-sm text-neutral-100 placeholder-neutral-600 focus:outline-none focus:border-neutral-600 resize-none"
                   />
 
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr", gap: "8px" }} className="mb-3">
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr 1fr 1fr", gap: "8px" }} className="mb-3">
                     <div>
                       <label className="text-xs text-neutral-500 mb-1 block">日期</label>
                       <input
@@ -713,6 +740,17 @@ export default function JournalPage() {
                         value={entryDate}
                         onChange={(e) => setEntryDate(e.target.value)}
                         className="w-full bg-neutral-900 border border-neutral-800 rounded px-2 py-1.5 text-xs text-neutral-100 focus:outline-none focus:border-neutral-600"
+                        style={{ colorScheme: "dark" }}
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-neutral-500 mb-1 block">結束日期（選填）</label>
+                      <input
+                        type="date"
+                        value={entryEndDate}
+                        onChange={(e) => setEntryEndDate(e.target.value)}
+                        className="w-full bg-neutral-900 border border-neutral-800 rounded px-2 py-1.5 text-xs text-neutral-100 focus:outline-none focus:border-neutral-600"
+                        style={{ colorScheme: "dark" }}
                       />
                     </div>
                     <div>
