@@ -226,12 +226,20 @@ export default function Home() {
       <footer className="px-6 py-12 border-t border-neutral-800">
         <div className="max-w-2xl mx-auto flex justify-between items-center text-xs text-neutral-600">
           <p>&copy; 2026 Jameswim</p>
-          <a
-            href="/admin"
-            className="hover:text-neutral-400 transition-colors"
-          >
-            Admin
-          </a>
+          <div className="flex gap-4">
+            <a
+              href="/journal"
+              className="hover:text-neutral-400 transition-colors"
+            >
+              Journal
+            </a>
+            <a
+              href="/admin"
+              className="hover:text-neutral-400 transition-colors"
+            >
+              Admin
+            </a>
+          </div>
         </div>
       </footer>
     </main>
