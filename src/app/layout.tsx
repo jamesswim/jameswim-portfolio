@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -20,9 +20,15 @@ export const metadata: Metadata = {
   description: "嵌入式系統 / BMC / Linux 韌體 — Jameswim 的個人作品集與部落格",
   keywords: ["嵌入式系統", "BMC", "Linux", "韌體", "portfolio", "Jameswim"],
   authors: [{ name: "Jameswim" }],
+  manifest: "/manifest.json",
   icons: {
     icon: "/favicon.ico",
     apple: "/apple-touch-icon.png",
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Jameswim",
   },
   openGraph: {
     title: "Jameswim",
@@ -32,6 +38,12 @@ export const metadata: Metadata = {
     locale: "zh_TW",
     type: "website",
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0a0a0a",
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({
