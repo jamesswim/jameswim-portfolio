@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 
 const skills = [
   "C/C++",
@@ -175,14 +176,12 @@ export default function Home() {
             >
               Instagram
             </a>
-            <a
+            <Link
               href="/blog"
-              target="_blank"
-              rel="noopener noreferrer"
               className="text-neutral-500 hover:text-neutral-100 transition-colors"
             >
               Blog
-            </a>
+            </Link>
           </div>
         </div>
       </section>
