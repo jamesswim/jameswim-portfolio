@@ -99,12 +99,21 @@ export default function JournalPage() {
       .order("created_at", { ascending: true });
 
     if (data && data.length === 0) {
-      const defaults = DEFAULT_CATEGORIES.map((name) => ({
-        name,
-        user_id: user.id,
-      }));
-      await supabase.from("categories").insert(defaults);
-      setUserCategories(DEFAULT_CATEGORIES);
+      const { count } = await supabase
+        .from("journal")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user.id);
+
+      if (count === 0) {
+        const defaults = DEFAULT_CATEGORIES.map((name) => ({
+          name,
+          user_id: user.id,
+        }));
+        await supabase.from("categories").insert(defaults);
+        setUserCategories(DEFAULT_CATEGORIES);
+      } else {
+        setUserCategories([]);
+      }
     } else {
       setUserCategories(data ? data.map((c: any) => c.name) : []);
     }
