@@ -7,12 +7,23 @@ interface Post {
   id: string;
   title: string;
   content: string;
+  tags: string[] | null;
   created_at: string;
 }
 
 export default function BlogPage() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTag, setActiveTag] = useState<string | null>(null);
+
+  // 初始化：從 URL 讀 ?tag=xxx 作為預設過濾
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const t = params.get("tag");
+      if (t) setActiveTag(t);
+    }
+  }, []);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -33,9 +44,36 @@ export default function BlogPage() {
     fetchPosts();
   }, []);
 
+  // 從所有已發佈文章收集不重複的 tag
+  const allTags = Array.from(
+    new Set(posts.flatMap((p) => p.tags ?? []))
+  ).sort();
+
+  const tagCounts: Record<string, number> = {};
+  posts.forEach((p) => {
+    (p.tags ?? []).forEach((t) => {
+      tagCounts[t] = (tagCounts[t] || 0) + 1;
+    });
+  });
+
+  const filteredPosts = activeTag
+    ? posts.filter((p) => (p.tags ?? []).includes(activeTag))
+    : posts;
+
+  const selectTag = (tag: string | null) => {
+    setActiveTag(tag);
+    // 更新 URL 但不跳頁
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      if (tag) url.searchParams.set("tag", tag);
+      else url.searchParams.delete("tag");
+      window.history.replaceState(null, "", url.toString());
+    }
+  };
+
   return (
     <main className="min-h-screen bg-neutral-950 text-neutral-100 px-6 py-24">
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         <a
           href="/"
           className="text-sm text-neutral-500 hover:text-neutral-100 transition-colors"
@@ -43,15 +81,46 @@ export default function BlogPage() {
           ← Back
         </a>
 
-        <h1 className="text-4xl font-bold mt-8 mb-12">Blog</h1>
+        <h1 className="text-4xl font-bold mt-8 mb-8">Blog</h1>
+
+        {/* Tag filter bar */}
+        {allTags.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-12">
+            <button
+              onClick={() => selectTag(null)}
+              className={`text-xs px-3 py-1.5 rounded-full transition-colors ${
+                activeTag === null
+                  ? "bg-neutral-100 text-neutral-950 font-medium"
+                  : "bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-neutral-100 hover:border-neutral-600"
+              }`}
+            >
+              全部 ({posts.length})
+            </button>
+            {allTags.map((tag) => (
+              <button
+                key={tag}
+                onClick={() => selectTag(tag)}
+                className={`text-xs px-3 py-1.5 rounded-full transition-colors ${
+                  activeTag === tag
+                    ? "bg-neutral-100 text-neutral-950 font-medium"
+                    : "bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-neutral-100 hover:border-neutral-600"
+                }`}
+              >
+                #{tag} ({tagCounts[tag]})
+              </button>
+            ))}
+          </div>
+        )}
 
         {loading ? (
           <p className="text-neutral-500">Loading...</p>
-        ) : posts.length === 0 ? (
-          <p className="text-neutral-500">No posts yet.</p>
+        ) : filteredPosts.length === 0 ? (
+          <p className="text-neutral-500">
+            {activeTag ? `「${activeTag}」分類下還沒有文章。` : "No posts yet."}
+          </p>
         ) : (
           <div className="space-y-8">
-            {posts.map((post) => (
+            {filteredPosts.map((post) => (
               <article
                 key={post.id}
                 className="border-b border-neutral-800 pb-8"
@@ -61,11 +130,35 @@ export default function BlogPage() {
                     {post.title}
                   </h2>
                 </a>
-                <p className="text-sm text-neutral-500 mb-4">
-                  {new Date(post.created_at).toLocaleDateString()}
-                </p>
-                <p className="text-neutral-300 leading-relaxed">
-                  {post.content}
+
+                <div className="flex flex-wrap items-center gap-3 mb-3">
+                  <p className="text-sm text-neutral-500">
+                    {new Date(post.created_at).toLocaleDateString()}
+                  </p>
+                  {(post.tags ?? []).length > 0 && (
+                    <>
+                      <span className="text-neutral-700">·</span>
+                      <div className="flex flex-wrap gap-2">
+                        {(post.tags ?? []).map((tag) => (
+                          <button
+                            key={tag}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              selectTag(tag);
+                            }}
+                            className="text-xs px-2 py-0.5 rounded-full bg-neutral-800 text-neutral-400 hover:bg-neutral-700 hover:text-neutral-100 transition-colors"
+                          >
+                            #{tag}
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                <p className="text-neutral-400 leading-relaxed line-clamp-3 whitespace-pre-wrap">
+                  {post.content.slice(0, 240)}
+                  {post.content.length > 240 ? "..." : ""}
                 </p>
               </article>
             ))}

@@ -1,16 +1,24 @@
 "use client";
 
 import { useState, useEffect, use } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeHighlight from "rehype-highlight";
 import { supabase } from "@/lib/supabase";
 
 interface Post {
   id: string;
   title: string;
   content: string;
+  tags: string[] | null;
   created_at: string;
 }
 
-export default function PostPage({ params }: { params: Promise<{ id: string }> }) {
+export default function PostPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = use(params);
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
@@ -59,6 +67,8 @@ export default function PostPage({ params }: { params: Promise<{ id: string }> }
     );
   }
 
+  const tags = post.tags ?? [];
+
   return (
     <main className="min-h-screen bg-neutral-950 text-neutral-100 px-6 py-24">
       <article className="max-w-2xl mx-auto">
@@ -73,12 +83,35 @@ export default function PostPage({ params }: { params: Promise<{ id: string }> }
           {post.title}
         </h1>
 
-        <p className="text-sm text-neutral-500 mb-12">
-          {new Date(post.created_at).toLocaleDateString()}
-        </p>
+        <div className="flex flex-wrap items-center gap-3 mb-12">
+          <p className="text-sm text-neutral-500">
+            {new Date(post.created_at).toLocaleDateString()}
+          </p>
+          {tags.length > 0 && (
+            <>
+              <span className="text-neutral-700">·</span>
+              <div className="flex flex-wrap gap-2">
+                {tags.map((tag) => (
+                  <a
+                    key={tag}
+                    href={`/blog?tag=${encodeURIComponent(tag)}`}
+                    className="text-xs px-2.5 py-1 rounded-full bg-neutral-800 text-neutral-300 hover:bg-neutral-700 hover:text-neutral-100 transition-colors"
+                  >
+                    #{tag}
+                  </a>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
 
-        <div className="text-neutral-300 leading-relaxed whitespace-pre-wrap">
-          {post.content}
+        <div className="prose prose-invert prose-neutral max-w-none">
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            rehypePlugins={[rehypeHighlight]}
+          >
+            {post.content}
+          </ReactMarkdown>
         </div>
       </article>
     </main>
