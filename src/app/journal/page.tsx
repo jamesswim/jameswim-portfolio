@@ -91,6 +91,13 @@ export default function JournalPage() {
     }
   }, [user]);
 
+  useEffect(() => {
+    if (user) {
+      const name = user.user_metadata?.full_name || user.email?.split("@")[0] || "User";
+      document.title = `Journal | ${name}`;
+    }
+  }, [user]);
+
   const fetchCategories = async () => {
     const { data } = await supabase
       .from("categories")
