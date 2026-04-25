@@ -490,8 +490,8 @@ export default function JournalPage() {
           <h1 className="text-3xl font-bold">My Journal</h1>
           <a
             href="/"
-            style={{ color: "#3b82f6" }}
-            className="text-sm font-medium hover:opacity-80 transition-opacity"
+            className="px-4 py-2 rounded-lg text-sm font-medium text-white hover:opacity-80 transition-opacity"
+            style={{ backgroundColor: "#3b82f6" }}
           >
             ← Home
           </a>
