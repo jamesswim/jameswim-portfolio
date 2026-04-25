@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
+import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 
 // Monaco 編輯器只能在瀏覽器端跑，所以用 dynamic import 關掉 SSR
@@ -32,11 +34,13 @@ interface BlogTag {
 }
 
 export default function AdminPage() {
+  const router = useRouter();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [user, setUser] = useState<any>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [tags, setTags] = useState<BlogTag[]>([]);
   const [loading, setLoading] = useState(true);
+  const [unauthorized, setUnauthorized] = useState(false);
 
   // form state
   const [title, setTitle] = useState("");
@@ -52,19 +56,46 @@ export default function AdminPage() {
   const [newTagName, setNewTagName] = useState("");
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    let redirectTimeout: ReturnType<typeof setTimeout> | null = null;
+
+    const verify = async (session: Session | null) => {
+      if (!session) {
+        setUser(null);
+        setUnauthorized(false);
+        setLoading(false);
+        return;
+      }
+      // 呼叫 DB 函數 is_admin()，UUID 比對藏在 DB，前端只拿 true/false
+      const { data: isAdmin } = await supabase.rpc("is_admin");
+      if (!isAdmin) {
+        await supabase.auth.signOut();
+        setUser(null);
+        setUnauthorized(true);
+        setLoading(false);
+        // 3 秒後自動返回首頁
+        redirectTimeout = setTimeout(() => {
+          router.push("/");
+        }, 3000);
+      } else {
+        setUser(session.user);
+        setUnauthorized(false);
+        setLoading(false);
+      }
+    };
+
+    supabase.auth.getSession().then(({ data: { session } }) => verify(session));
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+      verify(session);
     });
 
-    return () => subscription.unsubscribe();
-  }, []);
+    return () => {
+      subscription.unsubscribe();
+      if (redirectTimeout) clearTimeout(redirectTimeout);
+    };
+  }, [router]);
 
   useEffect(() => {
     if (user) {
@@ -182,6 +213,32 @@ export default function AdminPage() {
     return (
       <main className="min-h-screen bg-neutral-950 text-neutral-100 flex items-center justify-center">
         <p className="text-neutral-500">Loading...</p>
+      </main>
+    );
+  }
+
+  if (unauthorized) {
+    return (
+      <main className="min-h-screen bg-neutral-950 text-neutral-100 flex items-center justify-center px-6">
+        <div className="text-center max-w-md">
+          <h1 className="text-4xl font-bold mb-3">未授權</h1>
+          <p className="text-lg text-neutral-300 mb-8">
+            您沒有權限訪問此頁面
+          </p>
+          <p className="text-sm text-neutral-500 mb-1">Unauthorized</p>
+          <p className="text-sm text-neutral-500 mb-10">
+            You don&apos;t have permission to access this page.
+          </p>
+          <p className="text-xs text-neutral-600 mb-6">
+            3 秒後自動返回首頁 / Redirecting in 3s...
+          </p>
+          <button
+            onClick={() => router.push("/")}
+            className="px-6 py-3 bg-neutral-100 text-neutral-950 rounded-lg font-medium hover:bg-white transition-colors"
+          >
+            立即返回首頁 / Back to Home
+          </button>
+        </div>
       </main>
     );
   }
