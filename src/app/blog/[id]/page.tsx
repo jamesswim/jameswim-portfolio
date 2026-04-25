@@ -72,16 +72,18 @@ export default function PostPage({
   return (
     <main className="min-h-screen bg-neutral-950 text-neutral-100 px-6 py-24">
       <article className="max-w-2xl mx-auto">
-        <a
-          href="/blog"
-          className="text-sm text-neutral-500 hover:text-neutral-100 transition-colors"
-        >
-          ← Back to Blog
-        </a>
-
-        <h1 className="text-3xl sm:text-4xl font-bold mt-8 mb-4">
-          {post.title}
-        </h1>
+        <div className="flex justify-between items-center gap-4 mb-4">
+          <h1 className="text-3xl sm:text-4xl font-bold">
+            {post.title}
+          </h1>
+          <a
+            href="/blog"
+            className="flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium text-white hover:opacity-80 transition-opacity"
+            style={{ backgroundColor: "#3b82f6" }}
+          >
+            ← Back to Blog
+          </a>
+        </div>
 
         <div className="flex flex-wrap items-center gap-3 mb-12">
           <p className="text-sm text-neutral-500">
