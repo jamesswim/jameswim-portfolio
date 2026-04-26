@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import { stripMarkdown } from "@/lib/markdown";
 
 interface Post {
   id: string;
@@ -16,7 +17,6 @@ export default function BlogPage() {
   const [loading, setLoading] = useState(true);
   const [activeTag, setActiveTag] = useState<string | null>(null);
 
-  // 初始化：從 URL 讀 ?tag=xxx 作為預設過濾
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
@@ -44,7 +44,6 @@ export default function BlogPage() {
     fetchPosts();
   }, []);
 
-  // 從所有已發佈文章收集不重複的 tag
   const allTags = Array.from(
     new Set(posts.flatMap((p) => p.tags ?? []))
   ).sort();
@@ -62,7 +61,6 @@ export default function BlogPage() {
 
   const selectTag = (tag: string | null) => {
     setActiveTag(tag);
-    // 更新 URL 但不跳頁
     if (typeof window !== "undefined") {
       const url = new URL(window.location.href);
       if (tag) url.searchParams.set("tag", tag);
@@ -85,7 +83,6 @@ export default function BlogPage() {
           </a>
         </div>
 
-        {/* Tag filter bar */}
         {allTags.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-12">
             <button
@@ -122,48 +119,52 @@ export default function BlogPage() {
           </p>
         ) : (
           <div className="space-y-8">
-            {filteredPosts.map((post) => (
-              <article
-                key={post.id}
-                className="border-b border-neutral-800 pb-8"
-              >
-                <a href={`/blog/${post.id}`}>
-                  <h2 className="text-xl font-semibold mb-2 text-neutral-300 hover:text-white underline-offset-4 hover:underline transition-colors cursor-pointer">
-                    {post.title}
-                  </h2>
-                </a>
+            {filteredPosts.map((post) => {
+              const preview = stripMarkdown(post.content);
+              const truncated = preview.length > 240;
+              return (
+                <article
+                  key={post.id}
+                  className="border-b border-neutral-800 pb-8"
+                >
+                  <a href={`/blog/${post.id}`}>
+                    <h2 className="text-xl font-semibold mb-2 text-neutral-300 hover:text-white underline-offset-4 hover:underline transition-colors cursor-pointer">
+                      {post.title}
+                    </h2>
+                  </a>
 
-                <div className="flex flex-wrap items-center gap-3 mb-3">
-                  <p className="text-sm text-neutral-500">
-                    {new Date(post.created_at).toLocaleDateString()}
+                  <div className="flex flex-wrap items-center gap-3 mb-3">
+                    <p className="text-sm text-neutral-500">
+                      {new Date(post.created_at).toLocaleDateString()}
+                    </p>
+                    {(post.tags ?? []).length > 0 && (
+                      <>
+                        <span className="text-neutral-700">·</span>
+                        <div className="flex flex-wrap gap-2">
+                          {(post.tags ?? []).map((tag) => (
+                            <button
+                              key={tag}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                selectTag(tag);
+                              }}
+                              className="text-xs px-2 py-0.5 rounded-full bg-neutral-800 text-neutral-400 hover:bg-neutral-700 hover:text-neutral-100 transition-colors"
+                            >
+                              #{tag}
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  <p className="text-neutral-400 leading-relaxed line-clamp-3">
+                    {preview.slice(0, 240)}
+                    {truncated ? "..." : ""}
                   </p>
-                  {(post.tags ?? []).length > 0 && (
-                    <>
-                      <span className="text-neutral-700">·</span>
-                      <div className="flex flex-wrap gap-2">
-                        {(post.tags ?? []).map((tag) => (
-                          <button
-                            key={tag}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              selectTag(tag);
-                            }}
-                            className="text-xs px-2 py-0.5 rounded-full bg-neutral-800 text-neutral-400 hover:bg-neutral-700 hover:text-neutral-100 transition-colors"
-                          >
-                            #{tag}
-                          </button>
-                        ))}
-                      </div>
-                    </>
-                  )}
-                </div>
-
-                <p className="text-neutral-400 leading-relaxed line-clamp-3 whitespace-pre-wrap">
-                  {post.content.slice(0, 240)}
-                  {post.content.length > 240 ? "..." : ""}
-                </p>
-              </article>
-            ))}
+                </article>
+              );
+            })}
           </div>
         )}
       </div>
