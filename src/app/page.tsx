@@ -152,6 +152,24 @@ export default function Home() {
           </p>
 
           <div className="flex gap-6 items-center text-sm tracking-wide">
+            <Link
+              href="/projects"
+              className="text-neutral-500 hover:text-neutral-100 transition-colors"
+            >
+              Projects
+            </Link>
+            <Link
+              href="/blog"
+              className="text-neutral-500 hover:text-neutral-100 transition-colors"
+            >
+              Blog
+            </Link>
+            <Link
+              href="/tools"
+              className="text-neutral-500 hover:text-neutral-100 transition-colors"
+            >
+              Tools
+            </Link>
             <a
               href="https://github.com/jamesswim"
               target="_blank"
@@ -160,28 +178,6 @@ export default function Home() {
             >
               GitHub
             </a>
-            <a
-              href="https://www.youtube.com/@jameswim1107"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-neutral-500 hover:text-neutral-100 transition-colors"
-            >
-              YouTube
-            </a>
-            <a
-              href="https://www.instagram.com/jameswim_csie"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-neutral-500 hover:text-neutral-100 transition-colors"
-            >
-              Instagram
-            </a>
-            <Link
-              href="/blog"
-              className="text-neutral-500 hover:text-neutral-100 transition-colors"
-            >
-              Blog
-            </Link>
           </div>
         </div>
       </section>
@@ -226,6 +222,22 @@ export default function Home() {
         <div className="max-w-2xl mx-auto flex justify-between items-center text-xs text-neutral-600">
           <p>&copy; 2026 Jameswim</p>
           <div className="flex gap-4">
+            <a
+              href="https://www.youtube.com/@jameswim1107"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-neutral-400 transition-colors"
+            >
+              YouTube
+            </a>
+            <a
+              href="https://www.instagram.com/jameswim_csie"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-neutral-400 transition-colors"
+            >
+              Instagram
+            </a>
             <a
               href="/journal"
               className="hover:text-neutral-400 transition-colors"
