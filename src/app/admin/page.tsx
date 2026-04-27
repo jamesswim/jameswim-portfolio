@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import dynamic from "next/dynamic";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -262,7 +263,7 @@ export default function AdminPage() {
   return (
     <main className="min-h-screen bg-neutral-950 text-neutral-100 px-6 py-24">
       <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-12">
+        <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">Admin</h1>
           <div className="flex items-center gap-4">
             <p className="text-sm text-neutral-500">{user.email}</p>
@@ -274,6 +275,17 @@ export default function AdminPage() {
             </button>
           </div>
         </div>
+
+        {/* Section nav */}
+        <nav className="flex gap-6 mb-10 text-sm border-b border-neutral-800 pb-3">
+          <span className="text-neutral-100 font-medium">📝 Posts</span>
+          <Link
+            href="/admin/projects"
+            className="text-neutral-500 hover:text-neutral-100 transition-colors"
+          >
+            🗂 Projects
+          </Link>
+        </nav>
 
         {/* Tag Manager */}
         <div className="border border-neutral-800 rounded-lg p-4 mb-6 bg-neutral-900/40">
