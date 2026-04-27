@@ -6,6 +6,7 @@ import Link from "next/link";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import type { Project } from "@/lib/types";
+import ImageUploadButton from "@/components/ImageUploadButton";
 
 // Convert "a, b, c" -> ["a", "b", "c"], stripping blanks.
 function parseCsv(input: string): string[] {
@@ -490,15 +491,30 @@ export default function AdminProjectsPage() {
 
             <div>
               <label className="text-xs text-neutral-500 block mb-1">
-                Hero image URL
+                Hero image
               </label>
-              <input
-                type="text"
-                value={heroImage}
-                onChange={(e) => setHeroImage(e.target.value)}
-                placeholder="https://..."
-                className="w-full bg-neutral-900 border border-neutral-800 rounded px-3 py-2 text-sm text-neutral-100 font-mono focus:outline-none focus:border-neutral-600"
-              />
+              <div className="flex gap-2 items-start">
+                <input
+                  type="text"
+                  value={heroImage}
+                  onChange={(e) => setHeroImage(e.target.value)}
+                  placeholder="https://... 或按右邊 Upload 從電腦選檔"
+                  className="flex-1 bg-neutral-900 border border-neutral-800 rounded px-3 py-2 text-sm text-neutral-100 font-mono focus:outline-none focus:border-neutral-600"
+                />
+                <ImageUploadButton
+                  onUploaded={(url) => setHeroImage(url)}
+                />
+              </div>
+              {heroImage && (
+                <div className="mt-2">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={heroImage}
+                    alt="hero preview"
+                    className="max-h-32 rounded border border-neutral-800"
+                  />
+                </div>
+              )}
             </div>
 
             <details>

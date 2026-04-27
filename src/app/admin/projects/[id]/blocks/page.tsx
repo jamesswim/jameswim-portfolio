@@ -11,6 +11,7 @@ import type {
   ProjectBlock,
   ProjectBlockType,
 } from "@/lib/types";
+import ImageUploadButton from "@/components/ImageUploadButton";
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
   ssr: false,
@@ -523,15 +524,28 @@ function ImageBlockEditor({
 
   return (
     <div className="space-y-3">
-      <Field label="Image URL">
-        <input
-          type="text"
-          value={src}
-          onChange={(e) => setSrc(e.target.value)}
-          placeholder="https://..."
-          className="w-full bg-neutral-900 border border-neutral-800 rounded px-3 py-2 text-sm text-neutral-100 font-mono focus:outline-none focus:border-neutral-600"
-        />
+      <Field label="Image">
+        <div className="flex gap-2 items-start">
+          <input
+            type="text"
+            value={src}
+            onChange={(e) => setSrc(e.target.value)}
+            placeholder="https://... 或按右邊 Upload 從電腦選檔"
+            className="flex-1 bg-neutral-900 border border-neutral-800 rounded px-3 py-2 text-sm text-neutral-100 font-mono focus:outline-none focus:border-neutral-600"
+          />
+          <ImageUploadButton onUploaded={(url) => setSrc(url)} />
+        </div>
       </Field>
+      {src && (
+        <div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={src}
+            alt={alt || "preview"}
+            className="max-h-48 rounded border border-neutral-800"
+          />
+        </div>
+      )}
       <Field label="Alt text">
         <input
           type="text"
