@@ -7,6 +7,7 @@ import dynamic from "next/dynamic";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
+import rehypeRaw from "rehype-raw";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 
@@ -430,7 +431,14 @@ export default function AdminPage() {
                 </button>
               </div>
               <p className="text-xs text-neutral-600">
-                支援 Markdown：`##` 標題、```lang 程式碼、**粗體** 等
+                支援 Markdown + HTML：
+                <code className="px-1 text-neutral-400">**粗體**</code>
+                、
+                <code className="px-1 text-neutral-400">
+                  {`<span style="color:#3b82f6">藍字</span>`}
+                </code>
+                、
+                <code className="px-1 text-neutral-400">{`<mark>高亮</mark>`}</code>
               </p>
             </div>
 
@@ -461,7 +469,7 @@ export default function AdminPage() {
                   {content.trim() ? (
                     <ReactMarkdown
                       remarkPlugins={[remarkGfm]}
-                      rehypePlugins={[rehypeHighlight]}
+                      rehypePlugins={[rehypeRaw, rehypeHighlight]}
                     >
                       {content}
                     </ReactMarkdown>

@@ -3,6 +3,7 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
+import rehypeRaw from "rehype-raw";
 import type { ProjectBlock as ProjectBlockType } from "@/lib/types";
 
 // Renders one project content block based on its `type`.
@@ -16,7 +17,7 @@ export default function ProjectBlock({ block }: { block: ProjectBlockType }) {
         <div className="prose prose-invert prose-neutral max-w-none">
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
-            rehypePlugins={[rehypeHighlight]}
+            rehypePlugins={[rehypeRaw, rehypeHighlight]}
           >
             {text}
           </ReactMarkdown>
