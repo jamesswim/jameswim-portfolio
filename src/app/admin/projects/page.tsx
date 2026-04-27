@@ -592,8 +592,7 @@ export default function AdminProjectsPage() {
         </div>
 
         <div className="mt-12 p-4 border border-dashed border-neutral-700 rounded-lg text-xs text-neutral-500">
-          💡 內容區塊（block）的編輯器還沒做，目前只能管理 project 的
-          metadata。Block 編輯（markdown / image / metric / 之後的 code）會在下一個 stage 實作；在那之前要新增內容請用 Supabase SQL Editor 直接 insert 到 <code className="text-neutral-400">project_blocks</code> 表。
+          💡 點 <span style={{ color: "#60a5fa" }}>Blocks</span> 進入內容區塊編輯器（markdown / image / metric / video）。<code className="text-neutral-400">code</code> 區塊要等 CodeRunner 元件做完才會開放。
         </div>
       </div>
     </main>
@@ -642,7 +641,14 @@ function ProjectRow({
           </p>
         )}
       </div>
-      <div className="flex gap-3 shrink-0">
+      <div className="flex gap-3 shrink-0 items-center">
+        <Link
+          href={`/admin/projects/${project.id}/blocks`}
+          className="text-xs transition-colors"
+          style={{ color: "#60a5fa" }}
+        >
+          Blocks
+        </Link>
         <button
           onClick={() => onEdit(project)}
           className="text-xs text-neutral-500 hover:text-neutral-100 transition-colors"

@@ -71,7 +71,43 @@ export default function ProjectBlock({ block }: { block: ProjectBlockType }) {
       );
     }
 
-    case "video":
+    case "video": {
+      const c = block.content as {
+        src?: string;
+        kind?: "youtube" | "mp4";
+        caption?: string;
+      };
+      if (!c.src) return null;
+      return (
+        <figure className="my-6">
+          {c.kind === "youtube" ? (
+            <div
+              className="relative w-full rounded-lg overflow-hidden border border-neutral-800"
+              style={{ paddingBottom: "56.25%" }}
+            >
+              <iframe
+                src={c.src}
+                className="absolute inset-0 w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          ) : (
+            <video
+              src={c.src}
+              controls
+              className="w-full rounded-lg border border-neutral-800"
+            />
+          )}
+          {c.caption && (
+            <figcaption className="text-sm text-neutral-500 mt-2 text-center">
+              {c.caption}
+            </figcaption>
+          )}
+        </figure>
+      );
+    }
+
     case "code":
     case "gallery":
       return (
