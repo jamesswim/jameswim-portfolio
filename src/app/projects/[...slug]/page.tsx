@@ -116,6 +116,12 @@ export default function ProjectDetailPage({
     ? Object.entries(project.links).filter(([, url]) => !!url)
     : [];
 
+  // Contextual back target: parent hub if this is a sub-project, otherwise the index.
+  const parentCrumb =
+    breadcrumbs.length > 1 ? breadcrumbs[breadcrumbs.length - 2] : null;
+  const backHref = parentCrumb ? `/projects/${parentCrumb.slug}` : "/projects";
+  const backLabel = parentCrumb ? parentCrumb.title : "Projects";
+
   return (
     <main className="min-h-screen bg-neutral-950 text-neutral-100 px-6 py-24">
       <article className="max-w-3xl mx-auto">
@@ -144,8 +150,18 @@ export default function ProjectDetailPage({
           ))}
         </nav>
 
-        {/* Hero */}
-        <h1 className="text-4xl font-bold mb-4">{project.title}</h1>
+        {/* Hero: title left, blue back button right */}
+        <div className="flex justify-between items-start gap-4 mb-4">
+          <h1 className="text-4xl font-bold flex-1 min-w-0">{project.title}</h1>
+          <Link
+            href={backHref}
+            title={`← Back to ${backLabel}`}
+            className="px-4 py-2 rounded-lg text-sm font-medium text-white hover:opacity-80 transition-opacity shrink-0 inline-block max-w-xs truncate"
+            style={{ backgroundColor: "#3b82f6" }}
+          >
+            ← Back to {backLabel}
+          </Link>
+        </div>
         {project.summary && (
           <p className="text-lg text-neutral-300 leading-relaxed mb-6">
             {project.summary}
